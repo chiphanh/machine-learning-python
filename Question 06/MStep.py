@@ -22,7 +22,7 @@ def MStep(gamma, X):
     #####Insert your code here for subtask 6c#####
 
     N,D = X.shape
-    K= gamma.shape[1]
+    K = gamma.shape[1]
     # soft number of samples labeled k:
     N_k = gamma.sum(axis = 0).reshape(1,-1) #shape (1,K)
     #weights:
@@ -35,7 +35,8 @@ def MStep(gamma, X):
         sigma = np.zeros((D,D))
         for n in range(N):
             new_delta = X[n,:]-means[k,:]
-            sigma += gamma(n,k)*(new_delta @ new_delta.T)
+            sigma = sigma + gamma[n,k]*np.outer(new_delta.T, new_delta)
         covariances[:,:,k] = sigma/N_k[0,k]
     logLikelihood = getLogLikelihood(means, weights, covariances, X)
+    
     return weights, means, covariances, logLikelihood
