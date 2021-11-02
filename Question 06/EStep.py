@@ -21,20 +21,27 @@ def EStep(means, covariances, weights, X):
 
     #####Insert your code here for subtask 6b#####
 
-    N, D = shape(X)
-    K = shape(weights)[1]
+     N, D = X.shape
+    # K = weights.shape[1]
+    K = np.array(weights).reshape(1,-1).shape[1]
     logLikelihood = getLogLikelihood(means, weights, covariances, X)
 
+    gamma =np.zeros((N,K))
+
     for n in range(N):
-        gamma_nominator = np.zeros((N,K))
+        gamma_nominator = np.zeros((1,K))
+        
         gamma_denom =0
         for k in range(K):
             delta = X[n,:]-means[k]
             cov_mat = covariances[:,:,k]
-            cov_mat_inv = np.linalg.inv(cov_mat)
+            cov_mat_inv = np.linalg.pinv(cov_mat)
             denominator = (((2*np.pi)**(D/2))* np.sqrt(np.linalg.det(cov_mat)))
-            gamma_nominator[n,k] = weights[1,k]*np.exp(-0.5*(delta.T @ (cov_mat_inv @ delta)))/denominator
-            gamma_denom += gamma_nominator[n,k]
-        gamma = gamma_nominator/gamma_denom
-
+            gamma_nominator[0,k] = np.array(weights).reshape(1,-1)[0,k]*np.exp(-0.5*(delta.T @ (cov_mat_inv @ delta)))/denominator
+            gamma_denom += gamma_nominator[0,k]
+        for k in range(K):
+            gamma[n, k] = gamma_nominator[0,k]/gamma_denom
+            
+            
+        # print("the value of gamma is: ",gamma.shape)
     return [logLikelihood, gamma]
